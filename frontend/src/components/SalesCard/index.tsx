@@ -4,6 +4,8 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import { BASE_URL } from '../../utils/request';
+import { Sale } from '../../models/sales';
 
 function SalesCard() {
 
@@ -13,12 +15,14 @@ function SalesCard() {
   const [minDate, setMinDate] = useState(min);
   const [maxDate, setMaxDate] = useState(max);
 
-  useEffect(()=>{
-    axios.get("http://localhost:8080/sales")
+  const [sales, setSales] = useState<Sale[]>()
+
+  useEffect(() => {
+    axios.get(`${BASE_URL}/sales`)
       .then(Response => {
-        console.log(Response.data)
+        setSales(Response.data.content);
       });
-  },[])
+  }, [])
 
 
   return (
@@ -57,49 +61,27 @@ function SalesCard() {
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td className="show-992">#341</td>
-              <td className="show-576">08/11/2003</td>
-              <td>Ashtar Sheran</td>
-              <td className="show-992">15</td>
-              <td className="show-992">11</td>
-              <td>328000</td>
-              <td>
-                <div className="smmeta-red-btn-container">
-                  <NotificationButton />
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td className="show-992">#341</td>
-              <td className="show-576">08/11/2003</td>
-              <td>Ashtar Sheran</td>
-              <td className="show-992">15</td>
-              <td className="show-992">11</td>
-              <td>328000</td>
-              <td>
-                <div className="smmeta-red-btn-container">
-                  <NotificationButton />
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td className="show-992">#341</td>
-              <td className="show-576">08/11/2003</td>
-              <td>Ashtar Sheran</td>
-              <td className="show-992">15</td>
-              <td className="show-992">11</td>
-              <td>328000</td>
-              <td>
-                <div className="smmeta-red-btn-container">
-                  <NotificationButton />
-                </div>
-              </td>
-            </tr>
+            {sales?.map (sale => {
+              return (
+                < tr key ={sale.id} >
+                  <td className="show-992">{sale.id}</td>
+                  <td className="show-576">{new Date(sale.date).toLocaleDateString()}</td>
+                  <td>{sale.sellerName}</td>
+                  <td className="show-992">{sale.visited}</td>
+                  <td className="show-992">{sale.deals}</td>
+                  <td>R$ {sale.amount.toFixed(2)}</td>
+                  <td>
+                    <div className="smmeta-red-btn-container">
+                      <NotificationButton />
+                    </div>
+                  </td>
+                </tr>
+              )
+            })}
           </tbody>
         </table>
       </div>
-    </div>
+    </div >
   )
 }
 export default SalesCard;
